@@ -17,6 +17,7 @@ Designed with a clean UI and smooth user experience.
 - 🌍 **Online Multiplayer**
   - 🕹️ Host a Game
   - 🤝 Join a Game
+https://github.com/isbapatel/TicTacToe/blob/a083575535043e2a85a1f6586a5dbd6b5e55c76e/Screenshot%202025-11-14%20222814.png
 
 ### 🎵 UI & Audio
 - 🔊 Background music (looping)
