@@ -25,7 +25,7 @@ Designed with a clean UI and smooth user experience.
 - 📱 Fully responsive frontend
 
 ---
-
+https://github.com/isbapatel/TicTacToe/blob/main/Screenshot%202025-11-14%20222814.png?raw=true
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
