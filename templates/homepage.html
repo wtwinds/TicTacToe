@@ -1,0 +1,136 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Tic Tac Toe</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: radial-gradient(circle at top, #0f0f10, #090a13 80%);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background: rgba(20, 20, 25, 0.9);
+        padding: 60px 80px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(255, 165, 0, 0.15);
+        width: 400px;
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      h1 {
+        font-size: 2.4rem;
+        color: #ff6f00;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+      }
+
+      p {
+        font-size: 1rem;
+        color: #aaa;
+        margin-bottom: 35px;
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        margin: 10px 0;
+        transition: all 0.3s ease;
+      }
+
+      .btn.friend {
+        background: linear-gradient(90deg, #ff6f00, #ff9100);
+        color: white;
+        box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+      }
+
+      .btn.friend:hover {
+        box-shadow: 0 0 25px rgba(255, 140, 0, 0.7);
+        transform: translateY(-2px);
+      }
+
+      .btn.computer {
+        background: linear-gradient(90deg, #2979ff, #00b0ff);
+        color: white;
+        box-shadow: 0 0 10px rgba(41, 121, 255, 0.4);
+      }
+
+      .btn.computer:hover {
+        box-shadow: 0 0 25px rgba(41, 121, 255, 0.7);
+        transform: translateY(-2px);
+      }
+
+      .btn.about {
+        background: linear-gradient(90deg, #9c27b0, #e040fb);
+        color: white;
+        box-shadow: 0 0 10px rgba(156, 39, 176, 0.4);
+      }
+
+      .btn.about:hover {
+        box-shadow: 0 0 25px rgba(156, 39, 176, 0.7);
+        transform: translateY(-2px);
+      }
+
+      footer {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: #777;
+      }
+
+      footer span {
+        color: #ff6f00;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tic Tac Toe</h1>
+      <p>Play offline, challenge your friend, or battle the computer!</p>
+
+      <form action="{{ url_for('offline_mode') }}" method="get">
+        <button type="submit" class="btn friend">👥 Play with Friend (Offline)</button>
+      </form>
+
+      <form action="{{ url_for('computer_mode') }}" method="get">
+        <button type="submit" class="btn computer">🤖 Play vs Computer</button>
+      </form>
+
+      <form action="{{ url_for('about_page') }}" method="get">
+        <button type="submit" class="btn about">ℹ️ About Game</button>
+      </form>
+
+ <form action="{{ url_for('play_online') }}" method="get">
+  <button type="submit" class="btn host-btn">🎮 Host Game</button>
+</form>
+
+<form action="{{ url_for('join_game_route') }}" method="get">
+  <button type="submit" class="btn join-btn">🤝 Join Game</button>
+</form>
+
+
+
+      <footer>Made by Isba Patel</footer>
+    </div>
+  </body>
+  </html>

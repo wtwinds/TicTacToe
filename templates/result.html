@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Game Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .board { display: inline-block; margin: 20px; }
+    .row { display: flex; }
+    button {
+      width: 60px; height: 60px;
+      font-size: 24px;
+      margin: 2px;
+      border: 2px solid #555;
+      background-color: #f8f8f8;
+    }
+    .highlight {
+      background-color: gold;
+      color: black;
+      font-weight: bold;
+      border-color: #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>Game Over</h1>
+
+  {% if winner %}
+    <h2>🏆 {{ winner }} Wins!</h2>
+  {% else %}
+    <h2>It's a Draw!</h2>
+  {% endif %}
+
+  {% if board %}
+  <div class="board">
+    {% for r in range(3) %}
+      <div class="row">
+        {% for c in range(3) %}
+          <button class="{% if winning_positions and (r, c) in winning_positions %}highlight{% endif %}">
+            {{ board[r][c] }}
+          </button>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <br>
+  <a href="{{ url_for('restart') }}">Play Again</a><br>
+  <a href="{{ url_for('home') }}">Exit</a>
+</body>
+</html>

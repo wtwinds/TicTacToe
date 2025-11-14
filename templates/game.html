@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modern Tic Tac Toe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+    #winner-card {
+      animation: fadeIn 0.8s ease forwards;
+      opacity: 0;
+    }
+  #music-toggle {
+  background: linear-gradient(135deg, #2563eb, #3b82f6); /* same blue as invite friend */
+  color: white;
+  border: none;
+  font-weight: bold;
+  font-size: 16px;        
+  padding: 12px 25px;     
+  border-radius: 8px;     
+  cursor: pointer;
+  transition: 0.3s;
+  height: 40px;           
+  min-width: 160px;       
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+#music-toggle:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(37,99,235,0.4);
+}
+
+  </style>
+</head>
+<body class="modern-tic-tac-toe">
+
+  <header class="top-bar">
+    <h1>Modern Tic Tac Toe</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="#">Play Online</a>
+      <a href="#">Friends</a>
+      <a href="#">Settings</a>
+    </nav>
+  </header>
+
+  <main class="game-container">
+    <section class="player-panel left">
+      <h2>Player 1 ({{ player1 }})</h2>
+      <p class="score {% if winner %}score-animate{% endif %}">Wins: {{ wins["X"] }}</p>
+      <p class="score {% if winner %}score-animate{% endif %}">Losses: {{ losses["X"] }}</p>
+      <p class="score {% if winner %}score-animate{% endif %}">Draw: {{ draws["X"] }}</p>
+    </section>
+
+    <div class="board">
+      {% for r in range(3) %}
+      <div class="row">
+        {% for c in range(3) %}
+        <form action="{{ url_for('move') }}" method="POST" style="display:inline;">
+          <input type="hidden" name="row" value="{{ r }}">
+          <input type="hidden" name="col" value="{{ c }}">
+          <button type="submit" class="cell {% if board[r][c] == 'X' %}x-cell{% elif board[r][c] == 'O' %}o-cell{% endif %}{% if winning_positions and (r, c) in winning_positions %} highlight{% endif %}">
+            {{ board[r][c] }}
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if winner %}
+    <div id="winner-card" class="winner-card {% if winner == 'Draw' %}draw{% endif %}" style="display: none;">
+      <div class="trophy">🏆</div>
+      <h2>
+        {% if winner == "Draw" %}
+          It's a Draw!
+        {% else %}
+          🎉 {{ winner }} Wins! 🎉
+        {% endif %}
+      </h2>
+      <a href="{{ url_for('restart') }}" class="btn new-game">New Game</a>
+      <a href="{{ url_for('reset_all') }}" class="btn invite-friend">Reset Scores</a>
+    </div>
+    {% endif %}
+
+    <section class="player-panel right">
+      <h2>Player 2 ({{ player2 }})</h2>
+      <p class="score {% if winner %}score-animate{% endif %}">Wins: {{ wins["O"] }}</p>
+      <p class="score {% if winner %}score-animate{% endif %}">Losses: {{ losses["O"] }}</p>
+      <p class="score {% if winner %}score-animate{% endif %}">Draw: {{ draws["O"] }}</p>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button class="btn new-game" onclick="location.href='{{ url_for('restart') }}'">New Game</button>
+    <button class="btn invite-friend">Invite Friend</button>
+    <button id="music-toggle" onclick="toggleMusic()"> Toggle Music</button>
+    <iframe src="/static/background.html" style="display:none;" id="music-frame"></iframe>
+  </div>
+
+  <!-- 🔊 Victory sound -->
+  <audio id="victory-sound" src="{{ url_for('static', filename='victory.mp3') }}"></audio>
+
+  <!-- 🔊 Score sound -->
+  <audio id="score-sound" src="{{ url_for('static', filename='score.mp3') }}"></audio>
+
+  <!-- 🎉 JS for confetti, sound, and background music toggle -->
+  <script>
+    const scoreSound = document.getElementById("score-sound");
+
+    window.addEventListener("load", () => {
+      const winnerCard = document.getElementById("winner-card");
+      const victorySound = document.getElementById("victory-sound");
+
+      if (winnerCard) {
+        setTimeout(() => {
+          winnerCard.style.display = "block";
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+          if (victorySound) {
+            victorySound.play();
+            document.getElementById("music-frame").contentWindow.postMessage("stopMusic", window.location.origin);
+          }
+          if (scoreSound) scoreSound.play();
+        }, 1200);
+      }
+    });
+
+    function toggleMusic() {
+      const frame = document.getElementById("music-frame");
+      frame.contentWindow.postMessage("toggleMusic", window.location.origin);
+    }
+  </script>
+
+</body>
+</html>

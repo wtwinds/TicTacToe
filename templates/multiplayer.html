@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplayer Game</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="modern-tic-tac-toe">
+  <div class="top-bar">
+    <h1>Online Tic Tac Toe</h1>
+    <p>Game Code: <strong>{{ code }}</strong></p>
+    <p>You are Player: <strong>{{ player }}</strong></p>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <script>
+    const code = "{{ code }}";
+    const player = "{{ player }}";
+
+    function renderBoard(data) {
+      const board = document.getElementById("board");
+      board.innerHTML = "";
+      data.board.forEach((row, r) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+        row.forEach((cell, c) => {
+          const btn = document.createElement("button");
+          btn.classList.add("cell");
+          btn.textContent = cell;
+          btn.disabled = (cell !== '' || data.turn !== player || data.winner);
+          btn.onclick = () => makeMove(r, c);
+          rowDiv.appendChild(btn);
+        });
+        board.appendChild(rowDiv);
+      });
+      if (data.winner) alert(data.winner === 'Draw' ? "It's a Draw!" : `${data.winner} Wins!`);
+    }
+
+    function makeMove(r, c) {
+      fetch("/move_online", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: `code=${code}&row=${r}&col=${c}`
+      }).then(() => getState());
+    }
+
+    function getState() {
+      fetch(`/get_state/${code}`)
+        .then(res => res.json())
+        .then(data => renderBoard(data));
+    }
+
+    setInterval(getState, 1500);
+    getState();
+  </script>
+</body>
+</html>
+    
