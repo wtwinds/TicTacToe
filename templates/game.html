@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Modern Tic Tac Toe</title>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <style>
     @keyframes fadeIn {
       from { opacity: 0; transform: translate(-50%, -60%); }
@@ -15,31 +17,9 @@
       animation: fadeIn 0.8s ease forwards;
       opacity: 0;
     }
-  #music-toggle {
-  background: linear-gradient(135deg, #2563eb, #3b82f6); /* same blue as invite friend */
-  color: white;
-  border: none;
-  font-weight: bold;
-  font-size: 16px;        
-  padding: 12px 25px;     
-  border-radius: 8px;     
-  cursor: pointer;
-  transition: 0.3s;
-  height: 40px;           
-  min-width: 160px;       
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-}
-
-#music-toggle:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(37,99,235,0.4);
-}
-
   </style>
 </head>
+
 <body class="modern-tic-tac-toe">
 
   <header class="top-bar">
@@ -53,6 +33,7 @@
   </header>
 
   <main class="game-container">
+
     <section class="player-panel left">
       <h2>Player 1 ({{ player1 }})</h2>
       <p class="score {% if winner %}score-animate{% endif %}">Wins: {{ wins["X"] }}</p>
@@ -67,7 +48,10 @@
         <form action="{{ url_for('move') }}" method="POST" style="display:inline;">
           <input type="hidden" name="row" value="{{ r }}">
           <input type="hidden" name="col" value="{{ c }}">
-          <button type="submit" class="cell {% if board[r][c] == 'X' %}x-cell{% elif board[r][c] == 'O' %}o-cell{% endif %}{% if winning_positions and (r, c) in winning_positions %} highlight{% endif %}">
+          <button type="submit"
+            class="cell
+              {% if board[r][c] == 'X' %}x-cell{% elif board[r][c] == 'O' %}o-cell{% endif %}
+              {% if winning_positions and (r, c) in winning_positions %}highlight{% endif %}">
             {{ board[r][c] }}
           </button>
         </form>
@@ -77,7 +61,7 @@
     </div>
 
     {% if winner %}
-    <div id="winner-card" class="winner-card {% if winner == 'Draw' %}draw{% endif %}" style="display: none;">
+    <div id="winner-card" class="winner-card {% if winner == 'Draw' %}draw{% endif %}" style="display:none;">
       <div class="trophy">🏆</div>
       <h2>
         {% if winner == "Draw" %}
@@ -97,50 +81,40 @@
       <p class="score {% if winner %}score-animate{% endif %}">Losses: {{ losses["O"] }}</p>
       <p class="score {% if winner %}score-animate{% endif %}">Draw: {{ draws["O"] }}</p>
     </section>
+
   </main>
 
   <div class="controls">
     <button class="btn new-game" onclick="location.href='{{ url_for('restart') }}'">New Game</button>
     <button class="btn invite-friend">Invite Friend</button>
-    <button id="music-toggle" onclick="toggleMusic()"> Toggle Music</button>
-    <iframe src="/static/background.html" style="display:none;" id="music-frame"></iframe>
   </div>
 
-  <!-- 🔊 Victory sound -->
+  <!-- 🔊 Sounds (NO background music) -->
   <audio id="victory-sound" src="{{ url_for('static', filename='victory.mp3') }}"></audio>
-
-  <!-- 🔊 Score sound -->
   <audio id="score-sound" src="{{ url_for('static', filename='score.mp3') }}"></audio>
 
-  <!-- 🎉 JS for confetti, sound, and background music toggle -->
   <script>
-    const scoreSound = document.getElementById("score-sound");
-
     window.addEventListener("load", () => {
       const winnerCard = document.getElementById("winner-card");
       const victorySound = document.getElementById("victory-sound");
+      const scoreSound = document.getElementById("score-sound");
 
       if (winnerCard) {
         setTimeout(() => {
           winnerCard.style.display = "block";
+
           confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 }
           });
-          if (victorySound) {
-            victorySound.play();
-            document.getElementById("music-frame").contentWindow.postMessage("stopMusic", window.location.origin);
-          }
+
+          if (victorySound) victorySound.play();
           if (scoreSound) scoreSound.play();
+
         }, 1200);
       }
     });
-
-    function toggleMusic() {
-      const frame = document.getElementById("music-frame");
-      frame.contentWindow.postMessage("toggleMusic", window.location.origin);
-    }
   </script>
 
 </body>

@@ -2,58 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Multiplayer Game</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>Multiplayer Tic Tac Toe</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f1220;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 5px;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #aaa;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cell {
+      background: #1e2240;
+      border: none;
+      font-size: 2.5rem;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .cell:hover {
+      background: #2a2f5f;
+    }
+
+    .info {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+  </style>
 </head>
-<body class="modern-tic-tac-toe">
-  <div class="top-bar">
-    <h1>Online Tic Tac Toe</h1>
-    <p>Game Code: <strong>{{ code }}</strong></p>
-    <p>You are Player: <strong>{{ player }}</strong></p>
+
+<body>
+  <div class="container">
+    <h2>Game Code: {{ code }}</h2>
+    <h3>You are Player {{ player }}</h3>
+
+    <div class="board" id="board"></div>
+
+    <div class="info">
+      Share this code with your friend to join
+    </div>
   </div>
 
-  <div class="board" id="board"></div>
+<script>
+async function loadState() {
+  const res = await fetch("/get_state/{{ code }}");
+  const game = await res.json();
+  if (!game.board) return;
 
-  <script>
-    const code = "{{ code }}";
-    const player = "{{ player }}";
+  let html = "";
+  game.board.forEach((row, r) => {
+    row.forEach((cell, c) => {
+      html += `<button class="cell" onclick="makeMove(${r},${c})">${cell ?? ""}</button>`;
+    });
+  });
+  document.getElementById("board").innerHTML = html;
+}
 
-    function renderBoard(data) {
-      const board = document.getElementById("board");
-      board.innerHTML = "";
-      data.board.forEach((row, r) => {
-        const rowDiv = document.createElement("div");
-        rowDiv.classList.add("row");
-        row.forEach((cell, c) => {
-          const btn = document.createElement("button");
-          btn.classList.add("cell");
-          btn.textContent = cell;
-          btn.disabled = (cell !== '' || data.turn !== player || data.winner);
-          btn.onclick = () => makeMove(r, c);
-          rowDiv.appendChild(btn);
-        });
-        board.appendChild(rowDiv);
-      });
-      if (data.winner) alert(data.winner === 'Draw' ? "It's a Draw!" : `${data.winner} Wins!`);
-    }
+function makeMove(r, c) {
+  fetch("/move_online", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `code={{ code }}&row=${r}&col=${c}&player={{ player }}`
+  }).then(loadState);
+}
 
-    function makeMove(r, c) {
-      fetch("/move_online", {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: `code=${code}&row=${r}&col=${c}`
-      }).then(() => getState());
-    }
-
-    function getState() {
-      fetch(`/get_state/${code}`)
-        .then(res => res.json())
-        .then(data => renderBoard(data));
-    }
-
-    setInterval(getState, 1500);
-    getState();
-  </script>
+setInterval(loadState, 1000);
+</script>
 </body>
 </html>
-    

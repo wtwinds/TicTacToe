@@ -2,18 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Join Game</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>Join Online Game</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f1220;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #181c36;
+      padding: 30px 40px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      width: 320px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background: #2979ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5393ff;
+    }
+
+    .error {
+      margin-top: 12px;
+      color: #ff5252;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
-<body class="home-page">
-  <div class="hero-section">
-    <h1 class="hero-title">Join Online Match</h1>
+
+<body>
+  <div class="card">
+    <h1>Join Game</h1>
+
     <form method="POST">
-      <input type="text" name="code" placeholder="Enter Game Code" required style="padding:10px; border-radius:8px;">
-      <button type="submit" class="btn invite-friend">Join</button>
+      <input type="text" name="code" placeholder="Enter Game Code" required>
+      <button type="submit">Join</button>
     </form>
+
     {% if error %}
-    <p style="color:red;">{{ error }}</p>
+      <div class="error">{{ error }}</div>
     {% endif %}
   </div>
 </body>
