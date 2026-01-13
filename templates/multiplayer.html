@@ -72,7 +72,12 @@
   </div>
 
 <script>
+let gameEnded = false;
+let intervalId = null;
+
 async function loadState() {
+  if (gameEnded) return;
+
   const res = await fetch("/get_state/{{ code }}");
   const game = await res.json();
   if (!game.board) return;
@@ -80,21 +85,37 @@ async function loadState() {
   let html = "";
   game.board.forEach((row, r) => {
     row.forEach((cell, c) => {
-      html += `<button class="cell" onclick="makeMove(${r},${c})">${cell ?? ""}</button>`;
+      html += `<button class="cell" onclick="makeMove(${r},${c})">${cell || ""}</button>`;
     });
   });
   document.getElementById("board").innerHTML = html;
+
+  // ✅ RESULT DETECTION
+  if (game.winner && !gameEnded) {
+    gameEnded = true;
+    clearInterval(intervalId);
+
+    if (game.winner === "Draw") {
+      window.location.href = "/result?winner=draw&code={{ code }}";
+    } else {
+      window.location.href = "/result?winner=" + game.winner + "&code={{ code }}";
+    }
+  }
 }
 
 function makeMove(r, c) {
+  if (gameEnded) return;
+
   fetch("/move_online", {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
     body: `code={{ code }}&row=${r}&col=${c}&player={{ player }}`
   }).then(loadState);
 }
 
-setInterval(loadState, 1000);
+// 🔥 START POLLING
+intervalId = setInterval(loadState, 800);
+loadState();   // ✅ THIS FIXES EVERYTHING
 </script>
 </body>
 </html>

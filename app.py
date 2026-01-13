@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from isba_logic import is_valid_move, check_win, check_draw
 from tic_tac_toe_part import create_empty_board
 from computer_logic import computer_move
@@ -27,28 +27,32 @@ difficulty = "easy"
 
 @app.route("/play_online")
 def play_online():
-    # ✅ FIX: redirect instead of render
     code = create_new_game()
-    return redirect(url_for("multiplayer_board", code=code, player="X"))
-
+    session["player"] = "X"
+    session["code"] = code
+    return redirect(url_for("multiplayer_board", code=code))
 
 @app.route("/join_game", methods=["GET", "POST"])
 def join_game_route():
     if request.method == "POST":
         code = request.form["code"]
         if join_game(code, "O"):
-            return redirect(url_for("multiplayer_board", code=code, player="O"))
+            session["player"] = "O"
+            session["code"] = code
+            return redirect(url_for("multiplayer_board", code=code))
         return render_template("join_game.html", error="Invalid or full game code")
+
     return render_template("join_game.html")
 
-
-@app.route("/multiplayer/<code>/<player>")
-def multiplayer_board(code, player):
+@app.route("/multiplayer/<code>")
+def multiplayer_board(code):
     game = games.get(code)
     if not game:
         return "Game not found", 404
-    return render_template("multiplayer.html", code=code, player=player)
 
+    # 🔒 role comes ONLY from session
+    player = session.get("player")
+    return render_template("multiplayer.html", code=code, player=player)
 
 @app.route("/move_online", methods=["POST"])
 def move_online():
@@ -230,15 +234,32 @@ def about_page():
     return render_template('about.html')
 
 
-@app.route('/result')
+@app.route("/result")
 def result():
+    winner = request.args.get("winner")
+    code = request.args.get("code")
+    game = games.get(code)
+
     return render_template(
-        'result.html',
-        board=board,
-        winner=winner,
-        winning_positions=winning_positions
+        "result.html",
+        winner=None if winner == "draw" else winner,
+        board=game["board"] if game else None,
+        winning_positions=None
     )
 
+@app.route("/rematch/<code>")
+def rematch(code):
+    game = games.get(code)
+    if not game:
+        return redirect(url_for("home"))
+
+    # 🔄 reset ONLY game state
+    game["board"] = [["" for _ in range(3)] for _ in range(3)]
+    game["turn"] = "X"
+    game["winner"] = None
+
+    # ❌ DO NOT touch session["player"]
+    return redirect(url_for("multiplayer_board", code=code))
 
 if __name__ == '__main__':
     app.run(debug=True)
